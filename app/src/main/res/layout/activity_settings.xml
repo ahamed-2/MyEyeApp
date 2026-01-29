@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:fillViewport="true"
+    tools:context=".SettingsActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <!-- Header -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/settings"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_primary"
+            android:layout_marginBottom="32dp"
+            android:layout_gravity="center_horizontal" />
+
+        <!-- Telegram Settings Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="@color/card_background"
+            android:layout_marginBottom="24dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/telegram_settings"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary"
+                    android:layout_marginBottom="20dp" />
+
+                <!-- Bot Token -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/bot_token"
+                    android:textSize="16sp"
+                    android:textColor="@color/text_primary"
+                    android:layout_marginBottom="8dp" />
+
+                <EditText
+                    android:id="@+id/etBotToken"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/enter_bot_token"
+                    android:inputType="textMultiLine"
+                    android:maxLines="3"
+                    android:minLines="2"
+                    android:background="@drawable/bg_edittext"
+                    android:padding="16dp"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="20dp" />
+
+                <!-- Chat ID -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/chat_id"
+                    android:textSize="16sp"
+                    android:textColor="@color/text_primary"
+                    android:layout_marginBottom="8dp" />
+
+                <EditText
+                    android:id="@+id/etChatId"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/enter_chat_id"
+                    android:inputType="text"
+                    android:background="@drawable/bg_edittext"
+                    android:padding="16dp"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="20dp" />
+
+                <!-- Instructions -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/telegram_instructions"
+                    android:textSize="14sp"
+                    android:textColor="@color/text_secondary"
+                    android:lineSpacingExtra="4dp" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Data Management Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="@color/card_background"
+            android:layout_marginBottom="24dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/data_management"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary"
+                    android:layout_marginBottom="20dp" />
+
+                <!-- Clear Logs Button -->
+                <Button
+                    android:id="@+id/btnClearLogs"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:text="@string/clear_all_logs"
+                    android:textAllCaps="false"
+                    android:textSize="16sp"
+                    android:background="@drawable/bg_button_accent"
+                    android:textColor="@color/white"
+                    android:layout_marginBottom="8dp"
+                    android:drawableStart="@drawable/ic_delete"
+                    android:drawablePadding="12dp"
+                    android:drawableTint="@color/white" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/clear_logs_warning"
+                    android:textSize="14sp"
+                    android:textColor="@color/text_secondary"
+                    android:lineSpacingExtra="4dp" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Action Buttons -->
+        <Button
+            android:id="@+id/btnSave"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="@string/save_settings"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            android:background="@drawable/bg_button_primary"
+            android:textColor="@color/white"
+            android:layout_marginBottom="16dp"
+            android:drawableStart="@drawable/ic_save"
+            android:drawablePadding="12dp"
+            android:drawableTint="@color/white" />
+
+        <Button
+            android:id="@+id/btnBack"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="@string/back_to_main"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            android:background="@drawable/bg_button_accent"
+            android:textColor="@color/white"
+            android:drawableStart="@drawable/ic_arrow_back"
+            android:drawablePadding="12dp"
+            android:drawableTint="@color/white" />
+
+        <!-- Footer Warning -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/settings_warning"
+            android:textSize="12sp"
+            android:textColor="@color/text_disabled"
+            android:gravity="center"
+            android:layout_marginTop="24dp"
+            android:layout_gravity="center"
+            android:lineSpacingExtra="2dp" />
+
+    </LinearLayout>
+</ScrollView>
