@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:fillViewport="true"
+    tools:context=".DeveloperProfileActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <!-- Header -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/developer_profile"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_primary"
+            android:layout_marginBottom="32dp"
+            android:layout_gravity="center_horizontal" />
+
+        <!-- Profile Image -->
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/developerImage"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:src="@drawable/ic_profile_placeholder"
+            app:civ_border_width="3dp"
+            app:civ_border_color="@color/primary"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="24dp" />
+
+        <!-- Developer Name -->
+        <TextView
+            android:id="@+id/developerName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_primary"
+            android:gravity="center"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Developer Bio -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="@color/card_background"
+            android:layout_marginBottom="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/about_developer"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary"
+                    android:layout_marginBottom="12dp" />
+
+                <TextView
+                    android:id="@+id/developerBio"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp"
+                    android:textColor="@color/text_secondary"
+                    android:lineSpacingExtra="6dp" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- App Purpose -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="@color/card_background"
+            android:layout_marginBottom="24dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/app_purpose"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary"
+                    android:layout_marginBottom="12dp" />
+
+                <TextView
+                    android:id="@+id/appPurpose"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp"
+                    android:textColor="@color/text_secondary"
+                    android:lineSpacingExtra="6dp" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Website Button -->
+        <Button
+            android:id="@+id/btnWebsite"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="@string/visit_website"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            android:background="@drawable/bg_button_primary"
+            android:textColor="@color/white"
+            android:layout_marginBottom="16dp"
+            android:drawableStart="@drawable/ic_web"
+            android:drawablePadding="12dp"
+            android:drawableTint="@color/white" />
+
+        <!-- Back Button -->
+        <Button
+            android:id="@+id/btnBack"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="@string/back"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            android:background="@drawable/bg_button_accent"
+            android:textColor="@color/white"
+            android:drawableStart="@drawable/ic_arrow_back"
+            android:drawablePadding="12dp"
+            android:drawableTint="@color/white" />
+
+        <!-- Footer -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/educational_only"
+            android:textSize="12sp"
+            android:textColor="@color/text_disabled"
+            android:gravity="center"
+            android:layout_marginTop="24dp"
+            android:layout_gravity="center" />
+
+    </LinearLayout>
+</ScrollView>
