@@ -1,117 +1,35 @@
-name: Android CI - Build APK
+name: Build Android APK
 
 on:
-  workflow_dispatch:  # শুধু ম্যানুয়াল ট্রিগার
-    inputs:
-      build_type:
-        description: 'APK Build Type'
-        required: true
-        default: 'debug'
-        type: choice
-        options:
-          - debug
-          - release
-      version_name:
-        description: 'Version Name (e.g., 1.0.0)'
-        required: false
-        default: '1.0.0'
-      version_code:
-        description: 'Version Code (e.g., 1)'
-        required: false
-        default: '1'
-
-env:
-  APP_NAME: "My Eye"
-  PACKAGE_NAME: "com.ahamedrahim.myeye"
-  ANDROID_COMPILE_SDK: "34"
-  ANDROID_BUILD_TOOLS: "34.0.0"
-  JAVA_VERSION: "17"
+  workflow_dispatch:
 
 jobs:
   build:
-    name: Build ${{ github.event.inputs.build_type }} APK
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Set up JDK 11
+      uses: actions/setup-java@v3
       with:
-        fetch-depth: 0
-        
-    - name: Setup Java ${{ env.JAVA_VERSION }}
-      uses: actions/setup-java@v4
-      with:
+        java-version: '11'
         distribution: 'temurin'
-        java-version: ${{ env.JAVA_VERSION }}
         
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v3
+    - name: Grant execute permission for gradlew
+      run: chmod +x ./gradlew
       
-    - name: Update Build Configuration
+    - name: Build APK
       run: |
-        echo "📱 Updating build configuration..."
-        echo "App Name: ${{ env.APP_NAME }}"
-        echo "Package Name: ${{ env.PACKAGE_NAME }}"
-        echo "Version Name: ${{ github.event.inputs.version_name }}"
-        echo "Version Code: ${{ github.event.inputs.version_code }}"
-        echo "Build Type: ${{ github.event.inputs.build_type }}"
+        ./gradlew clean
+        ./gradlew assembleDebug
         
-        # Update build.gradle with version info
-        sed -i "s/versionCode .*/versionCode ${{ github.event.inputs.version_code }}/" app/build.gradle
-        sed -i "s/versionName .*/versionName \"${{ github.event.inputs.version_name }}\"/" app/build.gradle
-        
-        # Update AndroidManifest.xml if needed
-        # sed -i "s/android:versionCode=\".*\"/android:versionCode=\"${{ github.event.inputs.version_code }}\"/" app/src/main/AndroidManifest.xml
-        # sed -i "s/android:versionName=\".*\"/android:versionName=\"${{ github.event.inputs.version_name }}\"/" app/src/main/AndroidManifest.xml
-        
-    - name: Make gradlew executable
-      run: chmod +x gradlew
-      
-    - name: Cache Gradle dependencies
-      uses: actions/cache@v3
+    - name: Upload APK
+      uses: actions/upload-artifact@v3
       with:
-        path: |
-          ~/.gradle/caches
-          ~/.gradle/wrapper
-        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-        restore-keys: |
-          ${{ runner.os }}-gradle-
-          
-    - name: Build Debug APK
-      if: github.event.inputs.build_type == 'debug'
-      run: |
-        echo "🔨 Building Debug APK..."
-        ./gradlew clean assembleDebug --stacktrace --info
-        echo "✅ Debug APK build completed!"
-        
-    - name: Build Release APK
-      if: github.event.inputs.build_type == 'release'
-      run: |
-        echo "🔨 Building Release APK..."
-        
-        # Create debug keystore for signing
-        echo "🔑 Creating debug keystore..."
-        mkdir -p ~/.android || true
-        keytool -genkeypair \
-          -v \
-          -keystore ~/.android/debug.keystore \
-          -alias androiddebugkey \
-          -keyalg RSA \
-          -keysize 2048 \
-          -validity 10000 \
-          -dname "CN=Android Debug,O=Android,C=US" \
-          -storepass android \
-          -keypass android \
-          -keyalg RSA \
-          -storetype pkcs12
-          
-        # Create keystore.properties file
-        echo "storePassword=android" > keystore.properties
-        echo "keyPassword=android" >> keystore.properties
-        echo "keyAlias=androiddebugkey" >> keystore.properties
-        echo "storeFile=~/.android/debug.keystore" >> keystore.properties
-        
-        ./gradlew clean assembleRelease --stacktrace --info
+        name: MyEye-App
+        path: app/build/outputs/apk/debug/app-debug.apk        ./gradlew clean assembleRelease --stacktrace --info
         echo "✅ Release APK build completed!"
         
     - name: List Build Outputs
