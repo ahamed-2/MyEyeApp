@@ -1,78 +1,25 @@
-name: Android APK Build
-
-on:
-  workflow_dispatch:
-  push:
-    branches: [ main, master ]
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup Java 17
+    - name: Setup Java
       uses: actions/setup-java@v4
       with:
-        java-version: '17'
+        java-version: '17' # অ্যান্ড্রয়েড ৮+ এর জন্য ১৭ ভার্সন ভালো
         distribution: 'temurin'
-        
-    - name: Fix Gradle Files
+
+    - name: Validate Gradle Wrapper
       run: |
-        echo "🔧 Fixing Gradle files..."
-        
-        # 1. Fix settings.gradle
-        cat > settings.gradle << 'EOF'
-        rootProject.name = "MyEyeApp"
-        include ':app'
-        EOF
-        
-        # 2. Fix build.gradle (project level)
-        cat > build.gradle << 'EOF'
-        buildscript {
-            repositories {
-                google()
-                mavenCentral()
-            }
-            dependencies {
-                classpath 'com.android.tools.build:gradle:8.1.0'
-            }
-        }
-        
-        allprojects {
-            repositories {
-                google()
-                mavenCentral()
-                maven { url 'https://jitpack.io' }
-            }
-        }
-        
-        task clean(type: Delete) {
-            delete rootProject.buildDir
-        }
-        EOF
-        
-        # 3. Create gradle wrapper
-        mkdir -p gradle/wrapper
-        cat > gradle/wrapper/gradle-wrapper.properties << 'EOF'
-        distributionBase=GRADLE_USER_HOME
-        distributionPath=wrapper/dists
-        distributionUrl=https\://services.gradle.org/distributions/gradle-8.0-bin.zip
-        zipStoreBase=GRADLE_USER_HOME
-        zipStorePath=wrapper/dists
-        EOF
-        
-    - name: Create gradlew
-      run: |
-        cat > gradlew << 'EOF'
-        #!/bin/bash
-        set -e
-        java -cp "gradle/wrapper/gradle-wrapper.jar" org.gradle.wrapper.GradleWrapperMain "$@"
-        EOF
+        if [ ! -f "gradlew" ]; then
+          echo "gradlew not found, generating one..."
+          gradle wrapper
+        fi
         chmod +x gradlew
+      
+    - name: Build APK
+      run: ./gradlew assembleDebug
         
-    - name: Create minimal gradle-wrapper.jar
+    - name: Create download page
       run: |
-        if [ ! -f "
+        mkdir -p public
+        # এখানে আপনার HTML কোডটি থাকবে (আগের মতো)
+        # ... HTML Code ...
+        
+        # আপনার স্ট্রাকচার অনুযায়ী APK পাথ চেক করুন
+        cp app/build/outputs/apk/debug/app-debug.apk public/
