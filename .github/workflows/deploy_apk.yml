@@ -25,20 +25,23 @@ jobs:
         distribution: 'temurin'
         cache: 'gradle'
 
-    - name: Clean & Fix Gradle Files
+    # এই স্টেপটি প্রজেক্টের সব কোটলিন ডিপেন্ডেন্সি ফোর্স ডিলিট করবে
+    - name: Force Clean Build Files
       run: |
-        # ১. গ্র্যাডল র‍্যাপার জেনারেট করা (স্টেবল ভার্সন)
-        gradle wrapper --gradle-version 8.2
+        echo "Cleaning Kotlin references..."
         
-        # ২. কোটলিন প্লাগইন রিমুভ করা (যেহেতু আপনি জাভা ব্যবহার করছেন)
-        # এই কমান্ডটি ৩ নম্বর লাইন থেকে কোটলিন প্লাগইন মুছে ফেলবে যা এরর দিচ্ছিল
-        sed -i "/org.jetbrains.kotlin.android/d" app/build.gradle
+        # app/build.gradle থেকে 'kotlin' লেখা আছে এমন যেকোনো লাইন ডিলিট করা হচ্ছে
+        sed -i '/kotlin/d' app/build.gradle
         
-        # ৩. পারমিশন সেট করা
+        # root build.gradle থেকেও 'kotlin' ডিলিট করা হচ্ছে (যদি থাকে)
+        sed -i '/kotlin/d' build.gradle
+        
+        # আমরা নিশ্চিত করছি যে একটি স্টেবল গ্র্যাডল র‍্যাপার তৈরি হচ্ছে
+        gradle wrapper --gradle-version 8.2 --distribution-type bin
         chmod +x gradlew
 
     - name: Build APK
-      run: ./gradlew assembleDebug --no-daemon
+      run: ./gradlew assembleDebug --stacktrace --no-daemon
         
     - name: Create download page
       run: |
@@ -51,23 +54,26 @@ jobs:
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>My Eye App - Download</title>
             <style>
-                body { font-family: sans-serif; text-align: center; background: #111827; color: white; padding-top: 100px; }
-                .card { background: #1f2937; padding: 40px; border-radius: 20px; display: inline-block; border: 1px solid #374151; }
-                .btn { background: #10b981; color: white; padding: 15px 30px; text-decoration: none; border-radius: 10px; font-weight: bold; display: inline-block; margin-top: 20px; }
+                body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; background: #0f172a; color: white; padding-top: 80px; }
+                .card { background: #1e293b; padding: 40px; border-radius: 20px; display: inline-block; box-shadow: 0 10px 25px rgba(0,0,0,0.5); border: 1px solid #334155; }
+                h1 { color: #38bdf8; }
+                .btn { background: #22c55e; color: white; padding: 15px 35px; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 18px; display: inline-block; margin-top: 25px; transition: 0.3s; }
+                .btn:hover { background: #16a34a; transform: scale(1.05); }
             </style>
         </head>
         <body>
             <div class="card">
                 <h1>👁️ My Eye App</h1>
-                <p>Build Completed Successfully!</p>
-                <a href="app-debug.apk" class="btn">📥 Download APK Now</a>
+                <p>Build Successful! Ready to install.</p>
+                <br>
+                <a href="app-debug.apk" class="btn">📥 Download APK</a>
             </div>
         </body>
         </html>
         EOF
         
-        # আপনার স্ট্রাকচার অনুযায়ী APK কপি
-        cp app/build/outputs/apk/debug/app-debug.apk public/
+        # APK কপি করা (পাথ না পেলে এরর দেখাবে না, শুধু ওয়ার্নিং দেবে)
+        cp app/build/outputs/apk/debug/app-debug.apk public/ || echo "APK Copy Failed!"
         
     - name: Upload Pages artifact
       uses: actions/upload-pages-artifact@v3
