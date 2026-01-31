@@ -25,44 +25,46 @@ jobs:
         distribution: 'temurin'
         cache: 'gradle'
 
-    # আপনার প্রজেক্টের প্লাগইন এরর ফিক্স করার জন্য স্টেবল গ্র্যাডল সেট করা হচ্ছে
-    - name: Setup Gradle Wrapper
+    # এই অংশটি অটোমেটিক বিল্ড এরর ফিক্স করবে
+    - name: Fix Project Files
       run: |
-        gradle wrapper --gradle-version 8.5 --distribution-type bin
+        # ১. গ্র্যাডল র‍্যাপার জেনারেট করা
+        gradle wrapper --gradle-version 8.5
+        
+        # ২. যদি কোটলিন প্লাগইনে ভার্সন না থাকে, তবে সেটি যোগ করা (বা জাভা প্রজেক্ট হলে রিমুভ করা)
+        # আমরা এখানে একটি ডিফেন্স মেকানিজম নিচ্ছি যাতে প্লাগইনটি পাওয়া যায়
+        sed -i "s/id 'org.jetbrains.kotlin.android'/id 'org.jetbrains.kotlin.android' version '1.9.0'/" app/build.gradle || true
+        
         chmod +x gradlew
-      
+
     - name: Build APK
-      run: |
-        # --no-daemon ব্যবহার করলে মেমোরি কম খরচ হয় এবং ফেইল হওয়ার চান্স কম থাকে
-        ./gradlew assembleDebug --no-daemon
+      run: ./gradlew assembleDebug --stacktrace
         
     - name: Create download page
       run: |
         mkdir -p public
         cat > public/index.html << 'EOF'
         <!DOCTYPE html>
-        <html lang="en">
+        <html>
         <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>My Eye App - Download</title>
+            <title>My Eye App Download</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1">
             <style>
-                body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; padding: 50px; background: #1a1a2e; color: white; }
-                .container { background: rgba(255,255,255,0.05); border-radius: 15px; padding: 30px; max-width: 500px; margin: 0 auto; border: 1px solid rgba(255,255,255,0.1); }
-                .btn { display: inline-block; background: #00d2ff; color: #1a1a2e; padding: 12px 25px; text-decoration: none; border-radius: 8px; font-weight: bold; margin-top: 20px; }
+                body { font-family: sans-serif; text-align: center; background: #0f172a; color: white; padding-top: 50px; }
+                .card { background: #1e293b; padding: 30px; border-radius: 15px; display: inline-block; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+                .btn { background: #38bdf8; color: #0f172a; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block; margin-top: 20px; }
             </style>
         </head>
         <body>
-            <div class="container">
+            <div class="card">
                 <h1>👁️ My Eye App</h1>
-                <p>Download the latest debug build</p>
-                <a href="app-debug.apk" class="btn">📥 Download APK (v1.0.0)</a>
+                <p>Status: Build Successful</p>
+                <a href="app-debug.apk" class="btn">📥 Download APK</a>
             </div>
         </body>
         </html>
         EOF
         
-        # আপনার প্রজেক্ট স্ট্রাকচার অনুযায়ী সঠিক পাথ থেকে APK কপি
         cp app/build/outputs/apk/debug/app-debug.apk public/
         
     - name: Upload Pages artifact
