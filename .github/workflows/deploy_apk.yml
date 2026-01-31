@@ -1,13 +1,33 @@
+name: Deploy APK to GitHub Pages
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
     - name: Setup Java
       uses: actions/setup-java@v4
       with:
-        java-version: '17' # অ্যান্ড্রয়েড ৮+ এর জন্য ১৭ ভার্সন ভালো
+        java-version: '17'
         distribution: 'temurin'
 
-    - name: Validate Gradle Wrapper
+    # gradlew ফাইল না থাকলে এটি অটো জেনারেট করবে
+    - name: Fix Gradle Wrapper
       run: |
         if [ ! -f "gradlew" ]; then
-          echo "gradlew not found, generating one..."
           gradle wrapper
         fi
         chmod +x gradlew
@@ -18,8 +38,51 @@
     - name: Create download page
       run: |
         mkdir -p public
-        # এখানে আপনার HTML কোডটি থাকবে (আগের মতো)
-        # ... HTML Code ...
+        cat > public/index.html << 'EOF'
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>My Eye App - Download APK</title>
+            <style>
+                body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; color: white; }
+                .container { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 20px; padding: 40px; max-width: 600px; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+                .logo { font-size: 60px; margin-bottom: 20px; }
+                .btn { display: inline-block; background: #4CAF50; color: white; padding: 15px 30px; text-decoration: none; border-radius: 50px; font-size: 18px; margin: 20px 0; transition: 0.3s; }
+                .btn:hover { background: #45a049; transform: translateY(-3px); }
+                .info { background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px; margin: 20px 0; text-align: left; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="logo">👁️</div>
+                <h1>My Eye App</h1>
+                <div class="info">
+                    <p><strong>App Name:</strong> My Eye</p>
+                    <p><strong>Version:</strong> 1.0.0</p>
+                </div>
+                <a href="app-debug.apk" class="btn">📥 Download APK</a>
+            </div>
+        </body>
+        </html>
+        EOF
         
-        # আপনার স্ট্রাকচার অনুযায়ী APK পাথ চেক করুন
+        # APK কপি করা হচ্ছে
         cp app/build/outputs/apk/debug/app-debug.apk public/
+        
+    - name: Upload Pages artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: ./public
+        
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build-apk
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
