@@ -25,23 +25,79 @@ jobs:
         distribution: 'temurin'
         cache: 'gradle'
 
-    # এই স্টেপটি প্রজেক্টের সব কোটলিন ডিপেন্ডেন্সি ফোর্স ডিলিট করবে
-    - name: Force Clean Build Files
+    # এই স্টেপটি আপনার build.gradle ফাইলটি নতুন করে জেনারেট করবে (Java Only)
+    - name: Override Build Files
       run: |
-        echo "Cleaning Kotlin references..."
+        echo "Creating fresh build.gradle files..."
         
-        # app/build.gradle থেকে 'kotlin' লেখা আছে এমন যেকোনো লাইন ডিলিট করা হচ্ছে
-        sed -i '/kotlin/d' app/build.gradle
-        
-        # root build.gradle থেকেও 'kotlin' ডিলিট করা হচ্ছে (যদি থাকে)
-        sed -i '/kotlin/d' build.gradle
-        
-        # আমরা নিশ্চিত করছি যে একটি স্টেবল গ্র্যাডল র‍্যাপার তৈরি হচ্ছে
-        gradle wrapper --gradle-version 8.2 --distribution-type bin
+        # ১. রুট build.gradle তৈরি করা
+        cat > build.gradle << 'EOF'
+        buildscript {
+            repositories {
+                google()
+                mavenCentral()
+            }
+            dependencies {
+                classpath 'com.android.tools.build:gradle:8.2.0'
+            }
+        }
+        allprojects {
+            repositories {
+                google()
+                mavenCentral()
+            }
+        }
+        task clean(type: Delete) {
+            delete rootProject.buildDir
+        }
+        EOF
+
+        # ২. অ্যাপ build.gradle তৈরি করা (সম্পূর্ণ জাভা কনফিগারেশন)
+        cat > app/build.gradle << 'EOF'
+        plugins {
+            id 'com.android.application'
+        }
+
+        android {
+            namespace 'com.ahamedrahim.myeye'
+            compileSdk 34
+
+            defaultConfig {
+                applicationId "com.ahamedrahim.myeye"
+                minSdk 24
+                targetSdk 34
+                versionCode 1
+                versionName "1.0"
+            }
+
+            buildTypes {
+                debug {
+                    minifyEnabled false
+                }
+                release {
+                    minifyEnabled true
+                    proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+                }
+            }
+            compileOptions {
+                sourceCompatibility JavaVersion.VERSION_1_8
+                targetCompatibility JavaVersion.VERSION_1_8
+            }
+        }
+
+        dependencies {
+            implementation 'androidx.appcompat:appcompat:1.6.1'
+            implementation 'com.google.android.material:material:1.11.0'
+            implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+        }
+        EOF
+
+        # ৩. গ্র্যাডল র‍্যাপার ঠিক করা
+        gradle wrapper --gradle-version 8.2
         chmod +x gradlew
 
     - name: Build APK
-      run: ./gradlew assembleDebug --stacktrace --no-daemon
+      run: ./gradlew assembleDebug --no-daemon --stacktrace
         
     - name: Create download page
       run: |
@@ -52,31 +108,38 @@ jobs:
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>My Eye App - Download</title>
+            <title>My Eye App</title>
             <style>
-                body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; background: #0f172a; color: white; padding-top: 80px; }
-                .card { background: #1e293b; padding: 40px; border-radius: 20px; display: inline-block; box-shadow: 0 10px 25px rgba(0,0,0,0.5); border: 1px solid #334155; }
-                h1 { color: #38bdf8; }
-                .btn { background: #22c55e; color: white; padding: 15px 35px; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 18px; display: inline-block; margin-top: 25px; transition: 0.3s; }
-                .btn:hover { background: #16a34a; transform: scale(1.05); }
+                body { font-family: sans-serif; text-align: center; padding: 50px; background: #000; color: #fff; }
+                .btn { background: #00f; color: white; padding: 15px 25px; text-decoration: none; border-radius: 5px; font-size: 20px; }
             </style>
         </head>
         <body>
-            <div class="card">
-                <h1>👁️ My Eye App</h1>
-                <p>Build Successful! Ready to install.</p>
-                <br>
-                <a href="app-debug.apk" class="btn">📥 Download APK</a>
-            </div>
+            <h1>My Eye App</h1>
+            <br><br>
+            <a href="app-debug.apk" class="btn">Download APK</a>
         </body>
         </html>
         EOF
         
-        # APK কপি করা (পাথ না পেলে এরর দেখাবে না, শুধু ওয়ার্নিং দেবে)
-        cp app/build/outputs/apk/debug/app-debug.apk public/ || echo "APK Copy Failed!"
+        # APK কপি করা
+        cp app/build/outputs/apk/debug/app-debug.apk public/
         
     - name: Upload Pages artifact
       uses: actions/upload-pages-artifact@v3
+      with:
+        path: ./public
+        
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build-apk
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
       with:
         path: ./public
         
