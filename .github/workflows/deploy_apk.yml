@@ -27,7 +27,7 @@ jobs:
 
     - name: Override & Fix Project
       run: |
-        # ১. রুট build.gradle (Simple & Clean)
+        # ১. রুট build.gradle তৈরি
         cat > build.gradle << 'EOF'
         buildscript {
             repositories { google(); mavenCentral() }
@@ -38,7 +38,7 @@ jobs:
         }
         EOF
 
-        # ২. অ্যাপ build.gradle (Error Tolerant)
+        # ২. অ্যাপ build.gradle তৈরি
         cat > app/build.gradle << 'EOF'
         plugins { id 'com.android.application' }
 
@@ -98,47 +98,14 @@ jobs:
         <body>
             <div class="card">
                 <h1>👁️ My Eye App</h1>
-                <p>Build Status: Success</p>
+                <p>Status: Ready to Download</p>
                 <a href="app-debug.apk" class="btn">📥 Download APK</a>
             </div>
         </body>
         </html>
         EOF
         
-        # APK কপি করা
         cp app/build/outputs/apk/debug/app-debug.apk public/ || echo "Copy failed"
-        
-    - name: Upload Pages artifact
-      uses: actions/upload-pages-artifact@v3
-      with:
-        path: ./public
-        
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build-apk
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-            <title>My Eye App</title>
-            <style>
-                body { font-family: sans-serif; text-align: center; padding: 50px; background: #000; color: #fff; }
-                .btn { background: #00f; color: white; padding: 15px 25px; text-decoration: none; border-radius: 5px; font-size: 20px; }
-            </style>
-        </head>
-        <body>
-            <h1>My Eye App</h1>
-            <br><br>
-            <a href="app-debug.apk" class="btn">Download APK</a>
-        </body>
-        </html>
-        EOF
-        
-        # APK কপি করা
-        cp app/build/outputs/apk/debug/app-debug.apk public/
         
     - name: Upload Pages artifact
       uses: actions/upload-pages-artifact@v3
