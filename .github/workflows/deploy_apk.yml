@@ -1,80 +1,84 @@
-name: Local APK Build
+name: Simple APK Build
 
 on:
   workflow_dispatch:
+  push:
+    branches: [ main, master ]
 
 jobs:
-  build-local:
+  build:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout
+    - name: Checkout code
       uses: actions/checkout@v4
       
-    - name: Setup Java
+    - name: Setup Java 17
       uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: 'temurin'
         
-    - name: Install Android Build Tools
+    - name: Install Android SDK components
       run: |
-        # Install basic Android build tools
-        wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
-        mkdir -p android-sdk/cmdline-tools
-        unzip commandlinetools-linux-11076708_latest.zip -d android-sdk/cmdline-tools
-        mv android-sdk/cmdline-tools/cmdline-tools android-sdk/cmdline-tools/latest
-        
-        export ANDROID_SDK_ROOT=$PWD/android-sdk
-        export PATH=$PATH:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin
-        
-        # Accept licenses
-        yes | sdkmanager --licenses || true
+        # Install only necessary Android SDK components
+        echo "Installing Android SDK..."
+        sudo apt-get update
+        sudo apt-get install -y android-sdk
         
     - name: Build APK
       run: |
-        echo "🔨 Starting build..."
+        echo "🔨 Building APK..."
+        echo "Current directory: $(pwd)"
+        echo "Files:"
+        ls -la
         
-        # Create minimal build.gradle if not exists
-        if [ ! -f "app/build.gradle" ]; then
-          echo "Creating build.gradle..."
-          mkdir -p app
-          cat > app/build.gradle << 'EOF'
-          plugins {
-              id 'com.android.application'
-          }
-          
-          android {
-              compileSdk 34
-              
-              defaultConfig {
-                  applicationId "com.ahamedrahim.myeye"
-                  minSdk 21
-                  targetSdk 34
-                  versionCode 1
-                  versionName "1.0"
-              }
-              
-              buildTypes {
-                  release {
-                      minifyEnabled false
-                  }
-              }
-          }
-          
-          dependencies {
-              implementation 'androidx.appcompat:appcompat:1.6.1'
-          }
-          EOF
+        # Try to build with available tools
+        if command -v gradle &> /dev/null; then
+          echo "Using system gradle..."
+          gradle clean assembleDebug
+        else
+          echo "Gradle not found, checking for gradlew..."
+          if [ -f "gradlew" ]; then
+            chmod +x gradlew
+            ./gradlew clean assembleDebug
+          else
+            echo "❌ No build tool found"
+            exit 1
+          fi
         fi
-        
-        # Build
-        gradle wrapper
-        chmod +x gradlew
-        ./gradlew clean assembleDebug
         
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: MyEye-App
+        name: MyEye-APK
         path: app/build/outputs/apk/debug/app-debug.apk
+        retention-days: 30
+        
+    - name: Create Simple Download Page
+      run: |
+        mkdir -p apk-site
+        cat > apk-site/index.html << 'EOF'
+        <html>
+        <head><title>My Eye APK Download</title></head>
+        <body style="text-align:center;padding:50px;font-family:Arial;">
+          <h1>My Eye App</h1>
+          <p>Package: com.ahamedrahim.myeye</p>
+          <p>Version: 1.0.0</p>
+          <a href="app-debug.apk" style="padding:15px 30px;background:#2196F3;color:white;text-decoration:none;border-radius:5px;display:inline-block;margin:20px;">
+            📥 Download APK
+          </a>
+          <p style="color:#666;margin-top:30px;">For educational purposes only</p>
+        </body>
+        </html>
+        EOF
+        
+        if [ -f "app/build/outputs/apk/debug/app-debug.apk" ]; then
+          cp app/build/outputs/apk/debug/app-debug.apk apk-site/
+        fi
+        
+    - name: Upload to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./apk-site
