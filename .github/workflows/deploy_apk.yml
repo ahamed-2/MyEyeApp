@@ -23,17 +23,18 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
+        cache: 'gradle'
 
-    # gradlew ফাইল না থাকলে এটি অটো জেনারেট করবে
-    - name: Fix Gradle Wrapper
+    # আপনার প্রজেক্টের প্লাগইন এরর ফিক্স করার জন্য স্টেবল গ্র্যাডল সেট করা হচ্ছে
+    - name: Setup Gradle Wrapper
       run: |
-        if [ ! -f "gradlew" ]; then
-          gradle wrapper
-        fi
+        gradle wrapper --gradle-version 8.5 --distribution-type bin
         chmod +x gradlew
       
     - name: Build APK
-      run: ./gradlew assembleDebug
+      run: |
+        # --no-daemon ব্যবহার করলে মেমোরি কম খরচ হয় এবং ফেইল হওয়ার চান্স কম থাকে
+        ./gradlew assembleDebug --no-daemon
         
     - name: Create download page
       run: |
@@ -44,31 +45,24 @@ jobs:
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>My Eye App - Download APK</title>
+            <title>My Eye App - Download</title>
             <style>
-                body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; color: white; }
-                .container { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 20px; padding: 40px; max-width: 600px; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-                .logo { font-size: 60px; margin-bottom: 20px; }
-                .btn { display: inline-block; background: #4CAF50; color: white; padding: 15px 30px; text-decoration: none; border-radius: 50px; font-size: 18px; margin: 20px 0; transition: 0.3s; }
-                .btn:hover { background: #45a049; transform: translateY(-3px); }
-                .info { background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px; margin: 20px 0; text-align: left; }
+                body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; padding: 50px; background: #1a1a2e; color: white; }
+                .container { background: rgba(255,255,255,0.05); border-radius: 15px; padding: 30px; max-width: 500px; margin: 0 auto; border: 1px solid rgba(255,255,255,0.1); }
+                .btn { display: inline-block; background: #00d2ff; color: #1a1a2e; padding: 12px 25px; text-decoration: none; border-radius: 8px; font-weight: bold; margin-top: 20px; }
             </style>
         </head>
         <body>
             <div class="container">
-                <div class="logo">👁️</div>
-                <h1>My Eye App</h1>
-                <div class="info">
-                    <p><strong>App Name:</strong> My Eye</p>
-                    <p><strong>Version:</strong> 1.0.0</p>
-                </div>
-                <a href="app-debug.apk" class="btn">📥 Download APK</a>
+                <h1>👁️ My Eye App</h1>
+                <p>Download the latest debug build</p>
+                <a href="app-debug.apk" class="btn">📥 Download APK (v1.0.0)</a>
             </div>
         </body>
         </html>
         EOF
         
-        # APK কপি করা হচ্ছে
+        # আপনার প্রজেক্ট স্ট্রাকচার অনুযায়ী সঠিক পাথ থেকে APK কপি
         cp app/build/outputs/apk/debug/app-debug.apk public/
         
     - name: Upload Pages artifact
