@@ -25,6 +25,28 @@ jobs:
         distribution: 'temurin'
         cache: 'gradle'
 
+    - name: Fix root build.gradle (Kotlin plugin version)
+      run: |
+        cat > build.gradle << 'EOF'
+        buildscript {
+            repositories {
+                google()
+                mavenCentral()
+            }
+            dependencies {
+                classpath 'com.android.tools.build:gradle:8.2.0'
+                classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.10'
+            }
+        }
+
+        allprojects {
+            repositories {
+                google()
+                mavenCentral()
+            }
+        }
+        EOF
+
     - name: Add gradle.properties (AndroidX fix)
       run: |
         cat > gradle.properties << 'EOF'
