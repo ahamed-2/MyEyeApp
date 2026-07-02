@@ -25,62 +25,20 @@ jobs:
         distribution: 'temurin'
         cache: 'gradle'
 
-    - name: Override & Fix Project
+    - name: Add gradle.properties (AndroidX fix)
       run: |
-        # ১. রুট build.gradle তৈরি
-        cat > build.gradle << 'EOF'
-        buildscript {
-            repositories { google(); mavenCentral() }
-            dependencies { classpath 'com.android.tools.build:gradle:8.2.0' }
-        }
-        allprojects {
-            repositories { google(); mavenCentral() }
-        }
+        cat > gradle.properties << 'EOF'
+        android.useAndroidX=true
+        android.enableJetifier=true
+        org.gradle.jvmargs=-Xmx2048m
         EOF
 
-        # ২. অ্যাপ build.gradle তৈরি
-        cat > app/build.gradle << 'EOF'
-        plugins { id 'com.android.application' }
-
-        android {
-            namespace 'com.ahamedrahim.myeye'
-            compileSdk 34
-            defaultConfig {
-                applicationId "com.ahamedrahim.myeye"
-                minSdk 21
-                targetSdk 34
-                versionCode 1
-                versionName "1.0"
-            }
-            buildTypes {
-                release {
-                    minifyEnabled false
-                }
-            }
-            lintOptions {
-                checkReleaseBuilds false
-                abortOnError false
-            }
-            compileOptions {
-                sourceCompatibility JavaVersion.VERSION_1_8
-                targetCompatibility JavaVersion.VERSION_1_8
-            }
-        }
-
-        dependencies {
-            implementation 'androidx.appcompat:appcompat:1.6.1'
-            implementation 'com.google.android.material:material:1.9.0'
-            implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-        }
-        EOF
-
-        # ৩. গ্র্যাডল সেটআপ
-        gradle wrapper --gradle-version 8.2
-        chmod +x gradlew
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
 
     - name: Build APK
       run: ./gradlew assembleDebug --no-daemon
-        
+
     - name: Create download page
       run: |
         mkdir -p public
@@ -104,14 +62,13 @@ jobs:
         </body>
         </html>
         EOF
-        
         cp app/build/outputs/apk/debug/app-debug.apk public/ || echo "Copy failed"
-        
+
     - name: Upload Pages artifact
       uses: actions/upload-pages-artifact@v3
       with:
         path: ./public
-        
+
   deploy:
     environment:
       name: github-pages
